@@ -1,6 +1,7 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { useDispatch } from 'react-redux'
 import { toggleMenu } from '../utils/appSlice';
+import { YOUTUBE_SEARCH_API } from '../utils/constants';
 
 const Header = () => {
   const dispatch = useDispatch();
@@ -14,6 +15,41 @@ const Header = () => {
 
 
  const [searchQuery, setSearchQuery] = useState("");
+
+ //debouncing
+
+ //make the api call after every key press but if the difference between key press is 
+ //more than 200 ms
+
+ useEffect(() => {
+
+
+const timer = setTimeout(()=> {
+
+  getSearchSuggestions();
+
+}, 200);
+
+return () => {
+  clearTimeout(timer);
+}
+
+ },[searchQuery]);
+
+
+const getSearchSuggestions = async () => {
+try {
+const data = await fetch(YOUTUBE_SEARCH_API+searchQuery,);
+const json = await data.json();
+console.log(json);
+}
+
+catch {
+  console.log("error encoutered")
+}
+
+}
+
 
   return (
     <div className="grid grid-flow-col p-5 m-2 shadow-lg">
