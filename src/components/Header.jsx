@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react'
-import { useDispatch } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import { toggleMenu } from '../utils/appSlice';
 import { YOUTUBE_SEARCH_API } from '../utils/constants';
+import { cacheResults } from '../utils/searchSlice';
 
 const Header = () => {
   const dispatch = useDispatch();
@@ -15,6 +16,10 @@ const Header = () => {
 
 
  const [searchQuery, setSearchQuery] = useState("");
+ const [suggestions, setSuggestions] = useState([]);
+ const [showSuggestions, setShowSuggestions] = useState(false);
+
+ const searchCache = useSelector((store)=> store.search);
 
  //debouncing
 
@@ -22,16 +27,20 @@ const Header = () => {
  //more than 200 ms
 
  useEffect(() => {
+  const timer = setTimeout(()=> {
+  if(searchCache[searchQuery]) {
+    setSuggestions(searchCache[searchQuery])
+  }
 
+  else {
+    getSearchSuggestions();
+  }
 
-const timer = setTimeout(()=> {
-
-  getSearchSuggestions();
 
 }, 200);
 
 return () => {
-  clearTimeout(timer);
+  clearTimeout(timer); 
 }
 
  },[searchQuery]);
@@ -41,7 +50,14 @@ const getSearchSuggestions = async () => {
 try {
 const data = await fetch(YOUTUBE_SEARCH_API+searchQuery,);
 const json = await data.json();
-console.log(json);
+setSuggestions(json[1])
+
+//update cache
+
+dispatch((cacheResults({
+  [searchQuery]: json[1],
+}
+)))
 }
 
 catch {
@@ -74,6 +90,10 @@ catch {
       </div>
 
       <div className="flex col-span-10 justify-center">
+
+
+     <div>
+
         <input
           className="w-1/2 border border-gray-400 p-2 rounded-l-full"
           type="text"
@@ -81,10 +101,28 @@ catch {
           onChange={(e)=>{
             setSearchQuery(e.target.value);
           }}
+          onFocus={()=> setShowSuggestions(true)}
+          onBlur={()=> setShowSuggestions(false)}
         />
         <button className=" border border-gray-400 p-2 rounded-r-full py-2 px-5 bg-gray-200">
           Search
         </button>
+      </div>
+
+     { showSuggestions && (<div>
+
+   <ul>
+         {suggestions.map((s) => {
+
+         return  <li key={s} className='py-2 px-3 shadow-sm hover:bg-gray-100'>{s}</li>
+
+         })}
+
+
+   </ul>
+      </div>)}
+
+
       </div>
 
       <div className="flex col-span-1">
