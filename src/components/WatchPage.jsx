@@ -3,6 +3,7 @@ import { useDispatch } from 'react-redux';
 import { closeMenu } from '../utils/appSlice';
 import { useSearchParams } from 'react-router-dom';
 import CommentsContainer from './CommentsContainer';
+import LiveChat from './LiveChat';
 
 
 
@@ -24,10 +25,11 @@ const WatchPage = () => {
 
 
   return (
-   <div className='flex flex-col'>
-   <div className='px-5'>
+   <div className='flex flex-col w-full'>
+   <div className='px-5 flex'>
+   <div>
       <iframe
-        width="1200"
+        width="1000"
         height="600"
         src={"https://www.youtube.com/embed/"+ UrlSearchParams.get("v") }
         title="True Motivational Story / The Basketball Diaries Movie Explained In Hindi &amp; Urdu"
@@ -35,6 +37,10 @@ const WatchPage = () => {
         allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
         allowFullScreen
       ></iframe>
+    </div>
+    <div className='w-full'>
+      <LiveChat />
+    </div>
     </div>
     <CommentsContainer />
     </div>
